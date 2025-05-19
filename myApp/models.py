@@ -26,10 +26,12 @@ class Answer(models.Model):
         return self.body
     
 
-class Response(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='user_surveys', on_delete=models.CASCADE)
-    answer = models.ForeignKey(Answer, related_name='answer_surveys', on_delete=models.CASCADE)
+class Submission(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    poll = models.ForeignKey(Poll, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
-        return f"{self.user.username} chose {self.answer.body}"
+
+class SubmittedAnswer(models.Model):
+    submission = models.ForeignKey(Submission, related_name='answers', on_delete=models.CASCADE)
+    answer = models.ForeignKey(Answer, on_delete=models.CASCADE)
