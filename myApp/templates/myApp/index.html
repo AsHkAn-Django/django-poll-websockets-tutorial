@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>Questions</h2>
+    <ol>
+    {% for question in questions %}
+        
+            <li>{{question.body}}</li>
+        <ul>
+        {% for answer in question.answers.all %}
+            
+            <li>{{answer.body}}</li>
+            
+        {% endfor %}
+        </ul>
+    {% endfor %}
+     </ol>   
+{% endblock content %}
+    
