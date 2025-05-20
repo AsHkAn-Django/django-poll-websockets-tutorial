@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Create a Poll</h2>
+<form method="post" id="poll-form">
+    {% csrf_token %}
+    <label for="poll-title">Poll Title:</label>
+    <input type="text" name="poll_title" required><br><br>
+
+    <div id="questions-container"></div>
+
+    <button type="button" onclick="addQuestion()">Add Question</button><br><br>
+    <button type="submit">Submit Poll</button>
+</form>
+
+<script>
+let questionCount = 0;
+
+function addQuestion() {
+    const qIndex = questionCount++;
+    const questionDiv = document.createElement('div');
+    questionDiv.classList.add('question-block');
+    questionDiv.innerHTML = `
+        <hr>
+        <label>Question:</label>
+        <input type="text" name="question_${qIndex}" required>
+        <div class="answers-container" id="answers_${qIndex}"></div>
+        <button type="button" onclick="addAnswer(${qIndex})">Add Answer</button>
+        <br><br>
+    `;
+    document.getElementById('questions-container').appendChild(questionDiv);
+}
+
+function addAnswer(qIndex) {
+    const container = document.getElementById(`answers_${qIndex}`);
+    const answerCount = container.children.length;
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.name = `answer_${qIndex}_${answerCount}`;
+    input.placeholder = `Answer ${answerCount + 1}`;
+    input.required = true;
+    container.appendChild(input);
+    container.appendChild(document.createElement('br'));
+}
+</script>
+{% endblock %}
