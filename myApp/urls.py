@@ -4,5 +4,6 @@ from django.urls import path
 app_name = "myApp"
 
 urlpatterns = [
-    path('', views.QuestionListView.as_view(), name='question_list'),
+    path('', views.PollListView.as_view(), name='home'),
+    path('poll/<int:pk>/', views.poll_view, name='poll'),
 ]
