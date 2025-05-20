@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load django_bootstrap5 %}
 {% block content %}
 <h2>Create a Poll</h2>
 <form method="post" id="poll-form">
@@ -16,9 +17,14 @@
 let questionCount = 0;
 
 function addQuestion() {
+    // If user clicks on addQuestion button add a questionfield to the form
+    // increase the index for question
     const qIndex = questionCount++;
+    // create a new div for it
     const questionDiv = document.createElement('div');
+    // add a class to the div
     questionDiv.classList.add('question-block');
+    // add this htmls to it
     questionDiv.innerHTML = `
         <hr>
         <label>Question:</label>
@@ -27,18 +33,28 @@ function addQuestion() {
         <button type="button" onclick="addAnswer(${qIndex})">Add Answer</button>
         <br><br>
     `;
+    // get the parent container and add this new created div to it
     document.getElementById('questions-container').appendChild(questionDiv);
 }
 
 function addAnswer(qIndex) {
+    // If user clicks on addAnswer button add an answerfiled to the form
+    // get the div that ansewr is in
     const container = document.getElementById(`answers_${qIndex}`);
+    // get the lenght of the items inside of it
     const answerCount = container.children.length;
+    // create an input
     const input = document.createElement('input');
+    // give it text type
     input.type = 'text';
+    // give it a name base on the question index and answer index
     input.name = `answer_${qIndex}_${answerCount}`;
+    // give it a placeholder 
     input.placeholder = `Answer ${answerCount + 1}`;
     input.required = true;
+    // add it to the div container
     container.appendChild(input);
+    // create a linebreak element and add it to the div container
     container.appendChild(document.createElement('br'));
 }
 </script>

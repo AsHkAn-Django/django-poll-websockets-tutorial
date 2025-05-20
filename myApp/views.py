@@ -38,16 +38,21 @@ def create_poll(request):
         title = request.POST.get("poll_title")
         poll = Poll.objects.create(title=title)
 
+        questions = {}  # Will store questions like {"0": "What's your favorite fruit?"}
+        answers = {}    # Will store answers like {"0": ["Apple", "Banana"], "1": ["Water", "Juice"]}
+        
         # Go through all POST items
-        questions = {}
-        answers = {}
-
         for key, value in request.POST.items():
             if key.startswith("question_"):
+                # key is the input name (e.g., "question_0")
+                # value is the user input (e.g., "What's your favorite color?")
                 q_index = key.split("_")[1]
+                # Extract the question index from the key (e.g., "question_0" → "0")
                 questions[q_index] = value
             elif key.startswith("answer_"):
+                # answer_0_0 → q_index = "0", a_index = "0"
                 _, q_index, a_index = key.split("_")
+                # Ensure answers[q_index] is a list, then append the answer body
                 answers.setdefault(q_index, []).append(value)
 
         for q_index, q_body in questions.items():
