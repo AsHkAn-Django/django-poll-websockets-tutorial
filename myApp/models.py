@@ -4,10 +4,12 @@ from django.conf import settings
 
 class Poll(models.Model):
     title = models.CharField(max_length=150)
+    num_votes = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.title
+    
 
 class Question(models.Model):
     body = models.CharField(max_length=150)
