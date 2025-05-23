@@ -5,6 +5,7 @@ class PollConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.poll_id = self.scope['url_route']['kwargs']['poll_id']
         self.poll_group_name = f'poll_{self.poll_id}'
+        print(f"[WS] Connecting to group {self.poll_group_name}")    # ← log
 
         await self.channel_layer.group_add(
             self.poll_group_name,

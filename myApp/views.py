@@ -35,10 +35,11 @@ def poll_view(request, pk):
 
             # Notify WebSocket group
             channel_layer = get_channel_layer()
+            print(f"[VIEW] Broadcasting to poll_{poll.id}: {poll.num_votes}")   # ← log
             async_to_sync(channel_layer.group_send)(
                 f'poll_{poll.id}',
                 {
-                    'type': 'poll_update',
+                    'type': 'vote_update',
                     'num_votes': poll.num_votes,
                 }
             )
