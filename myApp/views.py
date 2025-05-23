@@ -37,9 +37,9 @@ def poll_view(request, pk):
             channel_layer = get_channel_layer()
             print(f"[VIEW] Broadcasting to poll_{poll.id}: {poll.num_votes}")   # ← log
             async_to_sync(channel_layer.group_send)(
-                f'poll_{poll.id}',
+                f'poll_{poll.id}',            # must match the consumer’s group_name
                 {
-                    'type': 'vote_update',
+                    'type': 'vote_update',     # routes to PollConsumer.vote_update
                     'num_votes': poll.num_votes,
                 }
             )

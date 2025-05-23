@@ -17,11 +17,14 @@
 </div>
 
 <script>
+  // 1) Open WebSocket connection to the poll’s channel
     const pollId = "{{ poll.id }}";
     const socket = new WebSocket(`ws://${window.location.host}/ws/poll/${pollId}/`);
 
+  // 2) Listen for incoming messages
     socket.onmessage = function(e) {
         const data = JSON.parse(e.data);
+        // 3) Update the DOM with the new vote count
         document.getElementById("vote-count").innerText = data.num_votes;
     };
 </script>
