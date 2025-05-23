@@ -4,6 +4,8 @@ from django.views import generic
 from .models import Question, Poll, Submission, Answer, SubmittedAnswer
 from .forms import PollSubmissionForm , PollForm, QuestionForm, AnswerForm, QuestionFormSet
 from django.contrib.auth.decorators import login_required
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 
 
 
@@ -21,16 +23,32 @@ def poll_view(request, pk):
         form = PollSubmissionForm(request.POST, poll=poll)
         if form.is_valid():
             submission = Submission.objects.create(user=request.user, poll=poll)
-            
+
             for question in poll.questions.all():
                 answer_id = form.cleaned_data.get(f"question_{question.id}")
                 answer = Answer.objects.get(pk=answer_id)
                 SubmittedAnswer.objects.create(submission=submission, answer=answer)
+
+            # Update poll vote count
+            poll.num_votes += 1
+            poll.save()
+
+            # Notify WebSocket group
+            channel_layer = get_channel_layer()
+            async_to_sync(channel_layer.group_send)(
+                f'poll_{poll.id}',
+                {
+                    'type': 'poll_update',
+                    'num_votes': poll.num_votes,
+                }
+            )
+
             return redirect('myApp:home')
     else:
         form = PollSubmissionForm(poll=poll)
-    return render(request, 'myApp/poll.html', {'poll':poll, 'form':form})
-        
+
+    return render(request, 'myApp/poll.html', {'poll': poll, 'form': form})
+  
 
 @login_required
 def create_poll(request):

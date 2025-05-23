@@ -1,12 +1,16 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h2>Polls</h2>
-    <ol>
+<h2>Polls</h2>
+<ol>
     {% for poll in polls %}
-        
-          <a href="{% url 'myApp:poll' poll.pk %}">{{ poll.title }}</a>
+    <li>
+        <strong>{{ poll.title }}</strong><br>
+        <p id="vote-count-{{ poll.id }}">{{ poll.num_votes }} votes</p>
+        <a href="{% url 'myApp:poll' poll.id %}">Vote</a>
+    </li>
     {% endfor %}
-     </ol>   
-{% endblock content %}
-    
+</ol>
+
+{% endblock %}
+c

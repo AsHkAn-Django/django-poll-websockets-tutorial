@@ -3,10 +3,22 @@
 
 {% block content %}
     <h2>Poll</h2>
+    <p>Votes: <span id="vote-count">{{ poll.num_votes }}</span></p>
+
     <form action="" method="post">
         {% csrf_token %}
         {% bootstrap_form form %}
         <button type="submit" class="btn btn-outline-success">Submit</button>
     </form>
+
+    <script>
+        const pollId = "{{ poll.id }}";
+        const socket = new WebSocket(`ws://${window.location.host}/ws/poll/${pollId}/`);
+    
+        socket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            document.getElementById("vote-count").innerText = data.num_votes;
+        };
+    </script>
 {% endblock content %}
     
