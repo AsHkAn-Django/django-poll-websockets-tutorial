@@ -4,16 +4,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>{% block title %}Real-Time Polls{% endblock %}</title>
     {% bootstrap_css %}
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding-top: 60px;
+        }
+        .container {
+            max-width: 800px;
+        }
+        header {
+            margin-bottom: 2rem;
+        }
+    </style>
 </head>
 <body>
-    {% bootstrap_messages %}
-    
-    {% block content %}
-        
-    {% endblock content %}
-        
+    <div class="container">
+        <header class="text-center">
+            <h1 class="display-5 text-primary">📊 Real-Time Polling App</h1>
+        </header>
+
+        {% bootstrap_messages %}
+
+        {% block content %}
+        {% endblock %}
+    </div>
+
     {% bootstrap_javascript %}
 </body>
 </html>

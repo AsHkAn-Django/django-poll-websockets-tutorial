@@ -1,61 +1,54 @@
 {% extends 'base.html' %}
-{% load django_bootstrap5 %}
+{% block title %}Create a Poll{% endblock %}
 {% block content %}
-<h2>Create a Poll</h2>
-<form method="post" id="poll-form">
-    {% csrf_token %}
-    <label for="poll-title">Poll Title:</label>
-    <input type="text" name="poll_title" required><br><br>
 
-    <div id="questions-container"></div>
+<div class="card shadow-sm">
+    <div class="card-body">
+        <h3 class="card-title mb-4">Create a New Poll</h3>
 
-    <button type="button" onclick="addQuestion()">Add Question</button><br><br>
-    <button type="submit">Submit Poll</button>
-</form>
+        <form method="post" id="poll-form">
+            {% csrf_token %}
+
+            <div class="mb-3">
+                <label for="poll-title" class="form-label">Poll Title</label>
+                <input type="text" name="poll_title" class="form-control" required>
+            </div>
+
+            <div id="questions-container"></div>
+
+            <button type="button" class="btn btn-outline-primary mb-3" onclick="addQuestion()">➕ Add Question</button>
+            <br>
+            <button type="submit" class="btn btn-success">✅ Submit Poll</button>
+        </form>
+    </div>
+</div>
 
 <script>
 let questionCount = 0;
 
 function addQuestion() {
-    // If user clicks on addQuestion button add a questionfield to the form
-    // increase the index for question
     const qIndex = questionCount++;
-    // create a new div for it
     const questionDiv = document.createElement('div');
-    // add a class to the div
-    questionDiv.classList.add('question-block');
-    // add this htmls to it
+    questionDiv.classList.add('mb-4', 'p-3', 'border', 'rounded');
     questionDiv.innerHTML = `
-        <hr>
-        <label>Question:</label>
-        <input type="text" name="question_${qIndex}" required>
-        <div class="answers-container" id="answers_${qIndex}"></div>
-        <button type="button" onclick="addAnswer(${qIndex})">Add Answer</button>
-        <br><br>
+        <label class="form-label">Question:</label>
+        <input type="text" name="question_${qIndex}" class="form-control mb-2" required>
+        <div class="answers-container mb-2" id="answers_${qIndex}"></div>
+        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="addAnswer(${qIndex})">➕ Add Answer</button>
     `;
-    // get the parent container and add this new created div to it
     document.getElementById('questions-container').appendChild(questionDiv);
 }
 
 function addAnswer(qIndex) {
-    // If user clicks on addAnswer button add an answerfiled to the form
-    // get the div that ansewr is in
     const container = document.getElementById(`answers_${qIndex}`);
-    // get the lenght of the items inside of it
-    const answerCount = container.children.length;
-    // create an input
+    const answerCount = container.children.length / 2;
     const input = document.createElement('input');
-    // give it text type
     input.type = 'text';
-    // give it a name base on the question index and answer index
     input.name = `answer_${qIndex}_${answerCount}`;
-    // give it a placeholder 
     input.placeholder = `Answer ${answerCount + 1}`;
+    input.classList.add('form-control', 'mb-2');
     input.required = true;
-    // add it to the div container
     container.appendChild(input);
-    // create a linebreak element and add it to the div container
-    container.appendChild(document.createElement('br'));
 }
 </script>
 {% endblock %}

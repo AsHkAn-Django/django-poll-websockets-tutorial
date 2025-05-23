@@ -1,16 +1,22 @@
 {% extends 'base.html' %}
+{% block title %}All Polls{% endblock %}
 
 {% block content %}
-<h2>Polls</h2>
-<ol>
-    {% for poll in polls %}
-    <li>
-        <strong>{{ poll.title }}</strong><br>
-        <p id="vote-count-{{ poll.id }}">{{ poll.num_votes }} votes</p>
-        <a href="{% url 'myApp:poll' poll.id %}">Vote</a>
-    </li>
-    {% endfor %}
-</ol>
+<h3 class="mb-4">Available Polls</h3>
 
+{% if polls %}
+    <ul class="list-group">
+        {% for poll in polls %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    <strong>{{ poll.title }}</strong><br>
+                    <small class="text-muted" id="vote-count-{{ poll.id }}">{{ poll.num_votes }} vote{{ poll.num_votes|pluralize }}</small>
+                </div>
+                <a href="{% url 'myApp:poll' poll.id %}" class="btn btn-sm btn-outline-primary">Vote</a>
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p class="text-muted">No polls available.</p>
+{% endif %}
 {% endblock %}
-c
