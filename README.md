@@ -191,3 +191,13 @@ def your_view(request, some_id):
 daphne -b 127.0.0.1 -p 8000 your_project.asgi:application
 ```
 
+## So the Checklist would be like
+- ✔️	Install channels
+- ✔️	Set ASGI_APPLICATION in settings.py
+- ✔️	Configure CHANNEL_LAYERS
+- ✔️	Create asgi.py with ProtocolTypeRouter
+- ✔️	Add routing.py in your app with websocket_urlpatterns
+- ✔️	Create AsyncWebsocketConsumer
+- ✔️	Trigger updates via channel_layer.group_send
+- ✔️	Add WebSocket connection JS in template
+- ✔️	Run server with daphne (or uvicorn)
