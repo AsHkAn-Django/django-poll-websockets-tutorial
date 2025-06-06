@@ -56,9 +56,138 @@ You can find more of my work here: [My GitHub](https://github.com/AsHkAn-Django)
 5. Run the server  
    `python manage.py runserver`
 
-## Tutorial ()
+## Tutorial 
 
-COMING SOON
 
----
+# ✅ Django Channels + WebSockets Setup Checklist
+
+1. Install Requirements
+
+```bash
+pip install channels
+# Optional (for dev/test):
+pip install channels_redis
+```
+
+2. Update settings.py
+```python
+# Enable ASGI
+ASGI_APPLICATION = 'your_project_name.asgi.application'
+
+# Optional: Redis layer (for production or multiple workers)
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",  # use RedisChannelLayer for production
+        # "BACKEND": "channels_redis.core.RedisChannelLayer",
+        # "CONFIG": {"hosts": [("127.0.0.1", 6379)]}
+    },
+}
+```
+
+3. Create asgi.py
+In your project root (beside settings.py):
+
+```python
+# your_project/asgi.py
+
+import os
+import django
+from channels.routing import ProtocolTypeRouter, URLRouter
+from channels.auth import AuthMiddlewareStack
+from django.core.asgi import get_asgi_application
+import your_app.routing
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'your_project.settings')
+django.setup()
+
+application = ProtocolTypeRouter({
+    "http": get_asgi_application(),
+    "websocket": AuthMiddlewareStack(
+        URLRouter(
+            your_app.routing.websocket_urlpatterns
+        )
+    ),
+})
+```
+
+4. Create routing.py in your app
+
+```python
+# your_app/routing.py
+
+from django.urls import re_path
+from . import consumers
+
+websocket_urlpatterns = [
+    re_path(r'ws/some_path/(?P<some_id>\d+)/$', consumers.YourConsumer.as_asgi()),
+]
+```
+
+5. Create the WebSocket Consumer
+```python
+# your_app/consumers.py
+
+from channels.generic.websocket import AsyncWebsocketConsumer
+import json
+
+class YourConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
+        self.room_name = f'some_group_{self.scope["url_route"]["kwargs"]["some_id"]}'
+        await self.channel_layer.group_add(self.room_name, self.channel_name)
+        await self.accept()
+
+    async def disconnect(self, close_code):
+        await self.channel_layer.group_discard(self.room_name, self.channel_name)
+
+    async def receive(self, text_data):
+        # Optional: receive data from frontend
+        pass
+
+    async def some_update(self, event):
+        await self.send(text_data=json.dumps({
+            'message': event['message'],
+        }))
+```
+
+6. Trigger Events from Django Views
+```python
+# views.py
+
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+from django.http import HttpResponse
+
+def your_view(request, some_id):
+    # Your logic here
+    channel_layer = get_channel_layer()
+    async_to_sync(channel_layer.group_send)(
+        f'some_group_{some_id}',
+        {
+            'type': 'some_update',  # Must match method name in consumer
+            'message': 'Updated!'
+        }
+    )
+    return HttpResponse("Sent!")
+
+```
+
+7. Frontend JavaScript WebSocket
+```html
+<script>
+    const id = "{{ some_id }}";
+    const wsScheme = window.location.protocol === "https:" ? "wss" : "ws";
+    const socket = new WebSocket(`${wsScheme}://${window.location.host}/ws/some_path/${id}/`);
+
+    socket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+        document.getElementById('message').innerText = data.message;
+    };
+</script>
+```
+
+8. Run Your App with Daphne or Uvicorn
+```bash
+# Not manage.py runserver
+daphne -b 127.0.0.1 -p 8000 your_project.asgi:application
+```
 
